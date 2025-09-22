@@ -118,7 +118,7 @@
           letter-spacing: 0.5px;
       }
 
-      input, textarea {
+      input, textarea, select {
           width: 100%;
           padding: 15px;
           border: 1px solid #404040;
@@ -131,13 +131,18 @@
           font-weight: 300;
       }
 
-      input:focus, textarea:focus {
+      input:focus, textarea:focus, select:focus {
           outline: none;
           border-color: #e0e0e0;
       }
 
       input::placeholder, textarea::placeholder {
           color: #606060;
+      }
+
+      select option {
+          background: #1a1a1a;
+          color: #e0e0e0;
       }
 
       textarea {
@@ -173,6 +178,11 @@
       .btn-secondary:hover {
           background: #808080;
           color: #1a1a1a;
+      }
+
+      .btn-small {
+          padding: 8px 16px;
+          font-size: 0.9rem;
       }
 
       .flashcard {
@@ -322,6 +332,127 @@
           transform: none;
       }
 
+      /* Topic Management Styles */
+      .topic-section {
+          margin-top: 20px;
+          padding: 20px;
+          background: transparent;
+          border: 1px solid #404040;
+          border-radius: 4px;
+      }
+
+      .topic-section h3 {
+          color: #e0e0e0;
+          font-weight: 300;
+          margin-bottom: 15px;
+      }
+
+      .topic-input-group {
+          display: flex;
+          gap: 10px;
+          margin-bottom: 15px;
+          align-items: end;
+      }
+
+      .topic-input-group input {
+          flex: 1;
+          margin-bottom: 0;
+      }
+
+      .topic-list {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 10px;
+          margin-top: 15px;
+      }
+
+      .topic-tag {
+          background: transparent;
+          color: #b0b0b0;
+          border: 1px solid #606060;
+          padding: 6px 12px;
+          border-radius: 20px;
+          font-size: 0.9rem;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          font-weight: 300;
+      }
+
+      .topic-tag.selected {
+          border-color: #e0e0e0;
+          color: #e0e0e0;
+      }
+
+      .topic-tag .delete-topic {
+          background: none;
+          border: none;
+          color: inherit;
+          cursor: pointer;
+          font-size: 1.2rem;
+          line-height: 1;
+          padding: 0;
+          margin: 0;
+      }
+
+      .topic-tag .delete-topic:hover {
+          color: #ff6b6b;
+      }
+
+      .filter-section {
+          margin-bottom: 20px;
+          padding: 15px;
+          background: transparent;
+          border: 1px solid #404040;
+          border-radius: 4px;
+      }
+
+      .filter-section h4 {
+          color: #e0e0e0;
+          font-weight: 300;
+          margin-bottom: 10px;
+      }
+
+      .filter-options {
+          text-align: left;
+          margin-bottom: 15px;
+      }
+
+      .filter-options label {
+          display: inline-block;
+          margin-right: 10px;
+          font-weight: 300;
+          color: #b0b0b0;
+      }
+
+      .filter-options select {
+          padding: 8px 15px;
+          border: 1px solid #404040;
+          border-radius: 4px;
+          font-size: 1rem;
+          background: transparent;
+          color: #e0e0e0;
+          font-weight: 300;
+          width: auto;
+          min-width: 150px;
+      }
+
+      .filter-options select option {
+          background: #1a1a1a;
+          color: #e0e0e0;
+      }
+
+      .current-topic-display {
+          background: transparent;
+          border: 1px solid #606060;
+          border-radius: 4px;
+          padding: 10px 15px;
+          margin-bottom: 15px;
+          color: #e0e0e0;
+          font-size: 0.9rem;
+          text-align: center;
+      }
+
       /* Smart Review Styles */
       .smart-review-header {
           text-align: center;
@@ -384,33 +515,6 @@
           display: block;
           font-size: 1.5rem;
           font-weight: 300;
-          color: #e0e0e0;
-      }
-
-      .filter-options {
-          text-align: center;
-          margin-bottom: 20px;
-      }
-
-      .filter-options label {
-          display: inline-block;
-          margin-right: 10px;
-          font-weight: 300;
-          color: #b0b0b0;
-      }
-
-      .filter-options select {
-          padding: 8px 15px;
-          border: 1px solid #404040;
-          border-radius: 4px;
-          font-size: 1rem;
-          background: transparent;
-          color: #e0e0e0;
-          font-weight: 300;
-      }
-
-      .filter-options select option {
-          background: #1a1a1a;
           color: #e0e0e0;
       }
 
@@ -696,6 +800,7 @@
         <button class="tab" onclick="showTab('smart-review')">
           Smart Review
         </button>
+        <button class="tab" onclick="showTab('topics')">Topics</button>
         <button class="tab" onclick="showTab('manage')">Manage Cards</button>
       </div>
 
@@ -703,6 +808,14 @@
         <!-- Create Cards Section -->
         <div id="create" class="create-section active">
           <h2>Add New Flashcard</h2>
+          
+          <div class="form-group">
+            <label for="cardTopic">Topic:</label>
+            <select id="cardTopic">
+              <option value="">Select a topic (optional)</option>
+            </select>
+          </div>
+          
           <div class="form-group">
             <label for="front">Front (Question/Term):</label>
             <textarea
@@ -732,8 +845,61 @@
           </div>
         </div>
 
+        <!-- Topics Management Section -->
+        <div id="topics" class="create-section">
+          <h2>Topic Management</h2>
+          
+          <div class="topic-section">
+            <h3>Create New Topic</h3>
+            <div class="topic-input-group">
+              <input
+                type="text"
+                id="newTopicInput"
+                placeholder="Enter topic name..."
+                onkeypress="handleTopicEnter(event)"
+              />
+              <button class="btn btn-small" onclick="createTopic()">Add Topic</button>
+            </div>
+            
+            <div class="topic-list" id="topicList">
+              <p style="color: #808080;">No topics created yet.</p>
+            </div>
+          </div>
+
+          <div class="download-section">
+            <h3>Topic Statistics</h3>
+            <div id="topicStats" style="color: #b0b0b0;">
+              <p>Create topics to see statistics here.</p>
+            </div>
+          </div>
+        </div>
+
         <!-- Smart Review Section -->
         <div id="smart-review" class="create-section">
+          <div class="filter-section">
+            <h4>Filter by Topic</h4>
+            <div class="filter-options">
+              <label for="smartReviewTopicFilter">Topic:</label>
+              <select id="smartReviewTopicFilter" onchange="updateSmartReviewFilter()">
+                <option value="">All Topics</option>
+              </select>
+              
+              <label for="reviewFilter" style="margin-left: 20px;">Show cards:</label>
+              <select id="reviewFilter" onchange="filterReviewCards()">
+                <option value="all">All Cards</option>
+                <option value="unseen">Not Reviewed</option>
+                <option value="struggling">Struggling (😞)</option>
+                <option value="average">Mediocre (😐)</option>
+                <option value="confident">Confident (😊)</option>
+                <option value="needs-practice">Needs Practice (😞 + 😐)</option>
+              </select>
+            </div>
+            
+            <div class="current-topic-display" id="currentReviewTopic" style="display: none;">
+              Currently reviewing: <span id="currentReviewTopicName"></span>
+            </div>
+          </div>
+
           <div class="smart-review-header">
             <h2>Smart Review Mode</h2>
             <div class="review-stats">
@@ -758,18 +924,6 @@
                 <span class="stat-count" id="unseenCount">0</span>
               </div>
             </div>
-          </div>
-
-          <div class="filter-options">
-            <label for="reviewFilter">Show cards:</label>
-            <select id="reviewFilter" onchange="filterReviewCards()">
-              <option value="all">All Cards</option>
-              <option value="unseen">Not Reviewed</option>
-              <option value="struggling">Struggling (😞)</option>
-              <option value="average">Mediocre (😐)</option>
-              <option value="confident">Confident (😊)</option>
-              <option value="needs-practice">Needs Practice (😞 + 😐)</option>
-            </select>
           </div>
 
           <div class="card-counter">
@@ -835,6 +989,20 @@
 
         <!-- Study Mode Section -->
         <div id="study" class="create-section">
+          <div class="filter-section">
+            <h4>Filter by Topic</h4>
+            <div class="filter-options">
+              <label for="studyTopicFilter">Topic:</label>
+              <select id="studyTopicFilter" onchange="updateStudyFilter()">
+                <option value="">All Topics</option>
+              </select>
+            </div>
+            
+            <div class="current-topic-display" id="currentStudyTopic" style="display: none;">
+              Currently studying: <span id="currentStudyTopicName"></span>
+            </div>
+          </div>
+
           <div class="card-counter">
             <span id="cardNumber">0</span> of <span id="totalCards">0</span>
           </div>
@@ -863,6 +1031,20 @@
 
         <!-- Manage Cards Section -->
         <div id="manage" class="create-section">
+          <div class="filter-section">
+            <h4>Filter by Topic</h4>
+            <div class="filter-options">
+              <label for="manageTopicFilter">Topic:</label>
+              <select id="manageTopicFilter" onchange="updateManageFilter()">
+                <option value="">All Topics</option>
+              </select>
+            </div>
+            
+            <div class="current-topic-display" id="currentManageTopic" style="display: none;">
+              Showing cards from: <span id="currentManageTopicName"></span>
+            </div>
+          </div>
+
           <h2>Your Flashcards (<span id="cardCount">0</span>)</h2>
           <div id="cardList" class="card-list active">
             <p>
@@ -895,6 +1077,12 @@
         <button class="close-modal" onclick="closeEditModal()">&times;</button>
         <h2>Edit Flashcard</h2>
         <div class="form-group">
+          <label for="editTopic">Topic:</label>
+          <select id="editTopic">
+            <option value="">Select a topic (optional)</option>
+          </select>
+        </div>
+        <div class="form-group">
           <label for="editFront">Front (Question/Term):</label>
           <textarea
             id="editFront"
@@ -919,6 +1107,7 @@
 
     <script>
       let flashcards = [];
+      let topics = [];
       let currentCardIndex = 0;
       let isFlipped = false;
 
@@ -927,13 +1116,28 @@
       let currentReviewIndex = 0;
       let isReviewFlipped = false;
 
+      // Study mode filtered cards
+      let studyQueue = [];
+      let currentStudyIndex = 0;
+
+      // Manage mode filtered cards
+      let manageQueue = [];
+
       // Edit modal variables
       let editingCardIndex = -1;
 
-      // Load flashcards from localStorage on page load
+      // Current topic filters
+      let currentStudyTopic = '';
+      let currentReviewTopic = '';
+      let currentManageTopic = '';
+
+      // Load flashcards and topics from localStorage on page load
       window.onload = function () {
         loadCards();
+        loadTopics();
         updateDisplay();
+        updateTopicSelectors();
+        updateTopicStats();
       };
 
       function showTab(tabName) {
@@ -950,30 +1154,175 @@
         event.target.classList.add("active");
 
         // Update displays when switching tabs
-        if (tabName === "manage") {
-          displayCardList();
-        } else if (tabName === "study") {
-          updateStudyMode();
-        } else if (tabName === "smart-review") {
+        if (tabName === 'topics') {
+          displayTopics();
+          updateTopicStats();
+        } else if (tabName === 'manage') {
+          updateManageFilter();
+        } else if (tabName === 'study') {
+          updateStudyFilter();
+        } else if (tabName === 'smart-review') {
           updateReviewStats();
-          filterReviewCards();
+          updateSmartReviewFilter();
         }
+      }
+
+      // Topic Management Functions
+      function createTopic() {
+        const topicName = document.getElementById('newTopicInput').value.trim();
+        
+        if (!topicName) {
+          showNotification('Please enter a topic name.', 'error');
+          return;
+        }
+
+        if (topics.includes(topicName)) {
+          showNotification('Topic already exists.', 'error');
+          return;
+        }
+
+        topics.push(topicName);
+        document.getElementById('newTopicInput').value = '';
+        saveTopics();
+        updateTopicSelectors();
+        displayTopics();
+        updateTopicStats();
+        showNotification('Topic created successfully!', 'success');
+      }
+
+      function handleTopicEnter(event) {
+        if (event.key === 'Enter') {
+          createTopic();
+        }
+      }
+
+      function deleteTopic(topicName) {
+        if (!confirm(`Are you sure you want to delete the topic "${topicName}"? Cards in this topic will not be deleted, but will have no topic assigned.`)) {
+          return;
+        }
+
+        topics = topics.filter(topic => topic !== topicName);
+        
+        // Remove topic from all cards that have it
+        flashcards = flashcards.map(card => ({
+          ...card,
+          topic: card.topic === topicName ? '' : card.topic
+        }));
+        
+        saveTopics();
+        saveCards();
+        updateTopicSelectors();
+        displayTopics();
+        updateTopicStats();
+        displayCardList();
+        showNotification('Topic deleted successfully.', 'info');
+      }
+
+      function displayTopics() {
+        const topicList = document.getElementById('topicList');
+        
+        if (topics.length === 0) {
+          topicList.innerHTML = '<p style="color: #808080;">No topics created yet.</p>';
+          return;
+        }
+
+        topicList.innerHTML = topics.map(topic => `
+          <div class="topic-tag">
+            ${topic}
+            <button class="delete-topic" onclick="deleteTopic('${topic}')" title="Delete topic">
+              ×
+            </button>
+          </div>
+        `).join('');
+      }
+
+      function updateTopicSelectors() {
+        const selectors = [
+          'cardTopic',
+          'editTopic', 
+          'studyTopicFilter',
+          'smartReviewTopicFilter',
+          'manageTopicFilter'
+        ];
+
+        selectors.forEach(selectorId => {
+          const selector = document.getElementById(selectorId);
+          const currentValue = selector.value;
+          
+          // Clear existing options except the first one
+          const firstOption = selector.querySelector('option');
+          selector.innerHTML = '';
+          selector.appendChild(firstOption);
+
+          // Add topic options
+          topics.forEach(topic => {
+            const option = document.createElement('option');
+            option.value = topic;
+            option.textContent = topic;
+            selector.appendChild(option);
+          });
+
+          // Restore selection if still valid
+          if (topics.includes(currentValue)) {
+            selector.value = currentValue;
+          }
+        });
+      }
+
+      function updateTopicStats() {
+        const topicStats = document.getElementById('topicStats');
+        
+        if (topics.length === 0) {
+          topicStats.innerHTML = '<p>Create topics to see statistics here.</p>';
+          return;
+        }
+
+        const stats = {};
+        topics.forEach(topic => {
+          stats[topic] = flashcards.filter(card => card.topic === topic).length;
+        });
+
+        const unassigned = flashcards.filter(card => !card.topic || card.topic === '').length;
+
+        let statsHtml = '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">';
+        
+        topics.forEach(topic => {
+          statsHtml += `
+            <div style="padding: 10px; border: 1px solid #404040; border-radius: 4px;">
+              <strong>${topic}:</strong> ${stats[topic]} cards
+            </div>
+          `;
+        });
+
+        if (unassigned > 0) {
+          statsHtml += `
+            <div style="padding: 10px; border: 1px solid #404040; border-radius: 4px;">
+              <strong>No Topic:</strong> ${unassigned} cards
+            </div>
+          `;
+        }
+
+        statsHtml += '</div>';
+        topicStats.innerHTML = statsHtml;
       }
 
       function addCard() {
         const front = document.getElementById("front").value.trim();
         const back = document.getElementById("back").value.trim();
+        const topic = document.getElementById("cardTopic").value;
 
         if (front && back) {
           flashcards.push({
             front: front,
             back: back,
+            topic: topic,
             confidence: "unseen",
             lastReviewed: null,
             reviewCount: 0,
           });
           document.getElementById("front").value = "";
           document.getElementById("back").value = "";
+          document.getElementById("cardTopic").value = "";
 
           // Visual feedback
           const frontInput = document.getElementById("front");
@@ -989,6 +1338,7 @@
           saveCards();
           updateDisplay();
           updateReviewStats();
+          updateTopicStats();
           showNotification("Flashcard added successfully!", "success");
         } else {
           // Error feedback
@@ -1012,41 +1362,40 @@
 
       function updateDisplay() {
         document.getElementById("cardCount").textContent = flashcards.length;
-        document.getElementById("totalCards").textContent = flashcards.length;
-        displayCardList();
+        updateManageFilter(); // This will update the display
       }
 
       function displayCardList() {
         const cardList = document.getElementById("cardList");
+        const cardsToShow = manageQueue.length > 0 ? manageQueue : flashcards;
 
-        if (flashcards.length === 0) {
-          cardList.innerHTML =
-            '<p>No flashcards created yet. Go to the "Create Cards" tab to add some!</p>';
+        if (cardsToShow.length === 0) {
+          if (currentManageTopic) {
+            cardList.innerHTML = `<p>No flashcards found for topic "${currentManageTopic}".</p>`;
+          } else {
+            cardList.innerHTML = '<p>No flashcards created yet. Go to the "Create Cards" tab to add some!</p>';
+          }
           return;
         }
 
-        cardList.innerHTML = flashcards
-          .map(
-            (card, index) => `
+        cardList.innerHTML = cardsToShow
+          .map((card, displayIndex) => {
+            const actualIndex = flashcards.indexOf(card);
+            return `
                 <div class="card-item">
-                    <h3>Card ${index + 1} ${getConfidenceEmoji(
-              card.confidence
-            )}</h3>
+                    <h3>Card ${displayIndex + 1} ${getConfidenceEmoji(card.confidence)}${card.topic ? ` - ${card.topic}` : ''}</h3>
                     <p><strong>Front:</strong> ${card.front}</p>
                     <p><strong>Back:</strong> ${card.back}</p>
-                    <p><strong>Confidence:</strong> ${getConfidenceText(
-                      card.confidence
-                    )}</p>
-                    <p><strong>Times Reviewed:</strong> ${
-                      card.reviewCount || 0
-                    }</p>
+                    <p><strong>Topic:</strong> ${card.topic || 'None'}</p>
+                    <p><strong>Confidence:</strong> ${getConfidenceText(card.confidence)}</p>
+                    <p><strong>Times Reviewed:</strong> ${card.reviewCount || 0}</p>
                     <div class="card-actions">
-                        <button class="btn btn-edit" onclick="editCard(${index})" style="margin-right: 10px; padding: 8px 15px; font-size: 0.9rem;">Edit</button>
-                        <button class="btn btn-secondary" onclick="deleteCard(${index})" style="padding: 8px 15px; font-size: 0.9rem;">Delete</button>
+                        <button class="btn btn-edit" onclick="editCard(${actualIndex})" style="margin-right: 10px; padding: 8px 15px; font-size: 0.9rem;">Edit</button>
+                        <button class="btn btn-secondary" onclick="deleteCard(${actualIndex})" style="padding: 8px 15px; font-size: 0.9rem;">Delete</button>
                     </div>
                 </div>
-            `
-          )
+            `;
+          })
           .join("");
       }
 
@@ -1055,57 +1404,102 @@
         saveCards();
         updateDisplay();
         updateReviewStats();
+        updateTopicStats();
         if (currentCardIndex >= flashcards.length) {
           currentCardIndex = 0;
         }
-        updateStudyMode();
+        updateStudyFilter();
         showNotification("Flashcard deleted", "info");
       }
 
-      function nextCard() {
-        if (flashcards.length === 0) return;
+      // Study Mode Functions
+      function updateStudyFilter() {
+        const topicFilter = document.getElementById('studyTopicFilter').value;
+        currentStudyTopic = topicFilter;
+        
+        const topicDisplay = document.getElementById('currentStudyTopic');
+        const topicName = document.getElementById('currentStudyTopicName');
+        
+        if (topicFilter) {
+          studyQueue = flashcards.filter(card => card.topic === topicFilter);
+          topicDisplay.style.display = 'block';
+          topicName.textContent = topicFilter;
+        } else {
+          studyQueue = [...flashcards];
+          topicDisplay.style.display = 'none';
+        }
+        
+        currentStudyIndex = 0;
+        document.getElementById("totalCards").textContent = studyQueue.length;
+        updateStudyMode();
+        resetFlip();
+      }
 
-        currentCardIndex = (currentCardIndex + 1) % flashcards.length;
+      function nextCard() {
+        if (studyQueue.length === 0) return;
+
+        currentStudyIndex = (currentStudyIndex + 1) % studyQueue.length;
         updateStudyMode();
         resetFlip();
       }
 
       function previousCard() {
-        if (flashcards.length === 0) return;
+        if (studyQueue.length === 0) return;
 
-        currentCardIndex =
-          currentCardIndex === 0 ? flashcards.length - 1 : currentCardIndex - 1;
+        currentStudyIndex = currentStudyIndex === 0 ? studyQueue.length - 1 : currentStudyIndex - 1;
         updateStudyMode();
         resetFlip();
       }
 
       function shuffleCards() {
-        if (flashcards.length === 0) return;
+        if (studyQueue.length === 0) return;
 
-        for (let i = flashcards.length - 1; i > 0; i--) {
+        for (let i = studyQueue.length - 1; i > 0; i--) {
           const j = Math.floor(Math.random() * (i + 1));
-          [flashcards[i], flashcards[j]] = [flashcards[j], flashcards[i]];
+          [studyQueue[i], studyQueue[j]] = [studyQueue[j], studyQueue[i]];
         }
-        currentCardIndex = 0;
+        currentStudyIndex = 0;
         updateStudyMode();
         resetFlip();
       }
 
       function updateStudyMode() {
-        if (flashcards.length === 0) {
-          document.getElementById("cardFront").textContent =
+        if (studyQueue.length === 0) {
+          const message = currentStudyTopic ? 
+            `No flashcards available for topic "${currentStudyTopic}".` :
             "No flashcards available. Create some first!";
-          document.getElementById("cardBack").textContent =
-            "No flashcards available.";
+          document.getElementById("cardFront").textContent = message;
+          document.getElementById("cardBack").textContent = "No flashcards available.";
           document.getElementById("cardNumber").textContent = "0";
           return;
         }
 
-        const card = flashcards[currentCardIndex];
+        const card = studyQueue[currentStudyIndex];
         document.getElementById("cardFront").textContent = card.front;
         document.getElementById("cardBack").textContent = card.back;
-        document.getElementById("cardNumber").textContent =
-          currentCardIndex + 1;
+        document.getElementById("cardNumber").textContent = currentStudyIndex + 1;
+      }
+
+      // Manage Mode Functions
+      function updateManageFilter() {
+        const topicFilter = document.getElementById('manageTopicFilter').value;
+        currentManageTopic = topicFilter;
+        
+        const topicDisplay = document.getElementById('currentManageTopic');
+        const topicName = document.getElementById('currentManageTopicName');
+        
+        if (topicFilter) {
+          manageQueue = flashcards.filter(card => card.topic === topicFilter);
+          topicDisplay.style.display = 'block';
+          topicName.textContent = topicFilter;
+          document.getElementById("cardCount").textContent = `${manageQueue.length} (filtered from ${flashcards.length})`;
+        } else {
+          manageQueue = [...flashcards];
+          topicDisplay.style.display = 'none';
+          document.getElementById("cardCount").textContent = flashcards.length;
+        }
+        
+        displayCardList();
       }
 
       function flipCard() {
@@ -1129,7 +1523,7 @@
           return;
         }
 
-        const dataStr = JSON.stringify(flashcards, null, 2);
+        const dataStr = JSON.stringify({flashcards: flashcards, topics: topics}, null, 2);
         const dataUri =
           "data:application/json;charset=utf-8," + encodeURIComponent(dataStr);
 
@@ -1150,7 +1544,18 @@
         const reader = new FileReader();
         reader.onload = function (e) {
           try {
-            const importedCards = JSON.parse(e.target.result);
+            const importedData = JSON.parse(e.target.result);
+            let importedCards = [];
+            let importedTopics = [];
+
+            // Handle both old format (array) and new format (object)
+            if (Array.isArray(importedData)) {
+              importedCards = importedData;
+            } else if (importedData.flashcards) {
+              importedCards = importedData.flashcards;
+              importedTopics = importedData.topics || [];
+            }
+
             if (Array.isArray(importedCards)) {
               const validCards = importedCards.filter(
                 (card) =>
@@ -1161,19 +1566,30 @@
               );
 
               if (validCards.length > 0) {
+                // Merge topics
+                importedTopics.forEach(topic => {
+                  if (!topics.includes(topic)) {
+                    topics.push(topic);
+                  }
+                });
+
                 // Ensure imported cards have the new properties
                 const enhancedCards = validCards.map((card) => ({
                   ...card,
+                  topic: card.topic || '',
                   confidence: card.confidence || "unseen",
                   lastReviewed: card.lastReviewed || null,
                   reviewCount: card.reviewCount || 0,
                 }));
                 flashcards = flashcards.concat(enhancedCards);
                 saveCards();
+                saveTopics();
                 updateDisplay();
                 updateReviewStats();
+                updateTopicSelectors();
+                updateTopicStats();
                 showNotification(
-                  `Successfully imported ${validCards.length} flashcards!`,
+                  `Successfully imported ${validCards.length} flashcards${importedTopics.length > 0 ? ` and ${importedTopics.length} topics` : ''}!`,
                   "success"
                 );
               } else {
@@ -1211,10 +1627,14 @@
         currentCardIndex = 0;
         reviewQueue = [];
         currentReviewIndex = 0;
+        studyQueue = [];
+        currentStudyIndex = 0;
+        manageQueue = [];
         saveCards();
         updateDisplay();
         updateStudyMode();
         updateReviewStats();
+        updateTopicStats();
         resetFlip();
         showNotification("All flashcards have been cleared.", "info");
       }
@@ -1227,10 +1647,11 @@
         const saved = localStorage.getItem("flashcards");
         if (saved) {
           const loadedCards = JSON.parse(saved);
-          // Ensure all cards have the new properties for smart review
+          // Ensure all cards have the new properties for smart review and topics
           flashcards = loadedCards.map((card) => ({
             front: card.front,
             back: card.back,
+            topic: card.topic || '',
             confidence: card.confidence || "unseen",
             lastReviewed: card.lastReviewed || null,
             reviewCount: card.reviewCount || 0,
@@ -1238,8 +1659,42 @@
         }
       }
 
+      function saveTopics() {
+        localStorage.setItem("topics", JSON.stringify(topics));
+      }
+
+      function loadTopics() {
+        const saved = localStorage.getItem("topics");
+        if (saved) {
+          topics = JSON.parse(saved);
+        }
+      }
+
       // Smart Review Functions
+      function updateSmartReviewFilter() {
+        const topicFilter = document.getElementById('smartReviewTopicFilter').value;
+        currentReviewTopic = topicFilter;
+        
+        const topicDisplay = document.getElementById('currentReviewTopic');
+        const topicName = document.getElementById('currentReviewTopicName');
+        
+        if (topicFilter) {
+          topicDisplay.style.display = 'block';
+          topicName.textContent = topicFilter;
+        } else {
+          topicDisplay.style.display = 'none';
+        }
+        
+        updateReviewStats();
+        filterReviewCards();
+      }
+
       function updateReviewStats() {
+        const topicFilter = document.getElementById('smartReviewTopicFilter').value;
+        const cardsToAnalyze = topicFilter ? 
+          flashcards.filter(card => card.topic === topicFilter) : 
+          flashcards;
+
         const stats = {
           confident: 0,
           average: 0,
@@ -1247,46 +1702,42 @@
           unseen: 0,
         };
 
-        flashcards.forEach((card) => {
+        cardsToAnalyze.forEach((card) => {
           stats[card.confidence]++;
         });
 
         document.getElementById("confidentCount").textContent = stats.confident;
         document.getElementById("averageCount").textContent = stats.average;
-        document.getElementById("strugglingCount").textContent =
-          stats.struggling;
+        document.getElementById("strugglingCount").textContent = stats.struggling;
         document.getElementById("unseenCount").textContent = stats.unseen;
       }
 
       function filterReviewCards() {
         const filter = document.getElementById("reviewFilter").value;
+        const topicFilter = document.getElementById('smartReviewTopicFilter').value;
+        
+        let baseCards = topicFilter ? 
+          flashcards.filter(card => card.topic === topicFilter) : 
+          flashcards;
 
         switch (filter) {
           case "all":
-            reviewQueue = [...flashcards];
+            reviewQueue = [...baseCards];
             break;
           case "unseen":
-            reviewQueue = flashcards.filter(
-              (card) => card.confidence === "unseen"
-            );
+            reviewQueue = baseCards.filter((card) => card.confidence === "unseen");
             break;
           case "struggling":
-            reviewQueue = flashcards.filter(
-              (card) => card.confidence === "struggling"
-            );
+            reviewQueue = baseCards.filter((card) => card.confidence === "struggling");
             break;
           case "average":
-            reviewQueue = flashcards.filter(
-              (card) => card.confidence === "average"
-            );
+            reviewQueue = baseCards.filter((card) => card.confidence === "average");
             break;
           case "confident":
-            reviewQueue = flashcards.filter(
-              (card) => card.confidence === "confident"
-            );
+            reviewQueue = baseCards.filter((card) => card.confidence === "confident");
             break;
           case "needs-practice":
-            reviewQueue = flashcards.filter(
+            reviewQueue = baseCards.filter(
               (card) =>
                 card.confidence === "struggling" ||
                 card.confidence === "average"
@@ -1306,8 +1757,7 @@
         });
 
         currentReviewIndex = 0;
-        document.getElementById("totalReviewCards").textContent =
-          reviewQueue.length;
+        document.getElementById("totalReviewCards").textContent = reviewQueue.length;
         updateReviewMode();
       }
 
@@ -1325,9 +1775,11 @@
 
       function updateReviewMode() {
         if (reviewQueue.length === 0) {
-          document.getElementById("reviewCardFront").textContent =
+          const message = currentReviewTopic ? 
+            `No cards available for review with current filter in topic "${currentReviewTopic}".` :
             "No cards available for review with current filter.";
-          document.getElementById("reviewCardBack").textContent =
+          document.getElementById("reviewCardFront").textContent = message;
+          document.getElementById("reviewCardBack").textContent = 
             "Try changing the filter or adding more cards.";
           document.getElementById("reviewCardNumber").textContent = "0";
           document.getElementById("confidenceButtons").style.display = "none";
@@ -1337,8 +1789,7 @@
         const card = reviewQueue[currentReviewIndex];
         document.getElementById("reviewCardFront").textContent = card.front;
         document.getElementById("reviewCardBack").textContent = card.back;
-        document.getElementById("reviewCardNumber").textContent =
-          currentReviewIndex + 1;
+        document.getElementById("reviewCardNumber").textContent = currentReviewIndex + 1;
         document.getElementById("confidenceButtons").style.display = "flex";
         resetReviewFlip();
       }
@@ -1380,7 +1831,9 @@
         // Find the card in the main flashcards array and update it
         const cardIndex = flashcards.findIndex(
           (card) =>
-            card.front === currentCard.front && card.back === currentCard.back
+            card.front === currentCard.front && 
+            card.back === currentCard.back &&
+            card.topic === currentCard.topic
         );
 
         if (cardIndex !== -1) {
@@ -1409,7 +1862,12 @@
           return;
         }
 
-        flashcards.forEach((card) => {
+        const topicFilter = document.getElementById('smartReviewTopicFilter').value;
+        const cardsToReset = topicFilter ? 
+          flashcards.filter(card => card.topic === topicFilter) : 
+          flashcards;
+
+        cardsToReset.forEach((card) => {
           card.confidence = "unseen";
           card.lastReviewed = null;
           card.reviewCount = 0;
@@ -1419,7 +1877,11 @@
         updateReviewStats();
         filterReviewCards();
         displayCardList();
-        showNotification("All ratings have been reset.", "info");
+        
+        const message = topicFilter ? 
+          `All ratings for topic "${topicFilter}" have been reset.` :
+          "All ratings have been reset.";
+        showNotification(message, "info");
       }
 
       function getConfidenceEmoji(confidence) {
@@ -1460,6 +1922,7 @@
         const card = flashcards[index];
 
         // Populate the edit form
+        document.getElementById("editTopic").value = card.topic || '';
         document.getElementById("editFront").value = card.front;
         document.getElementById("editBack").value = card.back;
 
@@ -1477,6 +1940,7 @@
         editingCardIndex = -1;
 
         // Clear the form
+        document.getElementById("editTopic").value = "";
         document.getElementById("editFront").value = "";
         document.getElementById("editBack").value = "";
       }
@@ -1485,6 +1949,7 @@
         if (editingCardIndex < 0 || editingCardIndex >= flashcards.length)
           return;
 
+        const newTopic = document.getElementById("editTopic").value;
         const newFront = document.getElementById("editFront").value.trim();
         const newBack = document.getElementById("editBack").value.trim();
 
@@ -1509,6 +1974,7 @@
         }
 
         // Update the card while preserving confidence data
+        flashcards[editingCardIndex].topic = newTopic;
         flashcards[editingCardIndex].front = newFront;
         flashcards[editingCardIndex].back = newBack;
 
@@ -1516,6 +1982,7 @@
         saveCards();
         updateDisplay();
         displayCardList();
+        updateTopicStats();
 
         // Update review queue if the edited card is currently in it
         updateReviewQueue();
